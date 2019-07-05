@@ -13,6 +13,7 @@ import java.util.Date;
  */
 @Data
 public class BidBeautyRecord {
+
     private String recordId;
     private String orderId;
     private String cdKey;

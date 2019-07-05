@@ -35,6 +35,7 @@ public class BisBagRecord {
         this.createTime = dateTime;
     }
 
+
     public void setShareTime(Date shareTime) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateTime = dateFormat.format(shareTime).toString();

@@ -22,6 +22,7 @@ public class BisCashRecord {
     private String cashType;
     private String payTime;
 
+
     public void setPayTime(Date payTime) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateTime = dateFormat.format(payTime);
