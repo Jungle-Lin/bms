@@ -1,12 +1,16 @@
 package top.lin.shop.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Data
 @Component
+@AllArgsConstructor
+@NoArgsConstructor
 public class BisShopUser {
 
   private String shopUserId;
@@ -19,11 +23,11 @@ public class BisShopUser {
   private String workNumber;
   private String sex;
   private String postCode;
-  private java.sql.Date entryDate;
+  private Date entryDate;
   private String mobile;
   private String phone;
   private String email;
-  private java.sql.Date bornDate;
+  private Date bornDate;
   private String idno;
   private String address;
   private String linkman;
@@ -31,9 +35,9 @@ public class BisShopUser {
   private String status;
   private String isDel;
   private String remark;
-  private java.sql.Timestamp createTime;
+  private Date createTime;
   private String createUserId;
-  private java.sql.Timestamp modifyTime;
+  private Date modifyTime;
   private String modifyUserId;
 
 }
