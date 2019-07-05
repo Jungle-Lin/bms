@@ -1,10 +1,16 @@
 package top.lin.shop.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Data
 @Component
+@AllArgsConstructor
+@NoArgsConstructor
 public class BisShop {
 
   //店铺编号
@@ -33,9 +39,9 @@ public class BisShop {
   private String shopRemark;
   private String beginTime;
   private String endTime;
-  private java.sql.Timestamp createTime;
+  private Date createTime;
   private String createUserId;
-  private java.sql.Timestamp modifyTime;
+  private Date modifyTime;
   private String modifyUserId;
 
 }
