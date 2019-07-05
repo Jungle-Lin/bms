@@ -1,4 +1,4 @@
-package top.lin.bisbeautyrecord.service.impl;
+package top.lin.bis.service.impl;
 
 import org.springframework.stereotype.Service;
 
@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
  * @Date 2019/7/5
  */
 @Service
-public class BidBeautyRecordServiceImpl {
+public class BisCashRecordServiceImpl {
 }

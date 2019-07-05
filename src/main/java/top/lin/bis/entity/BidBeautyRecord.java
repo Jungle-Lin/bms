@@ -1,6 +1,10 @@
-package top.lin.bisbeautyrecord.entity;
+package top.lin.bis.entity;
 
 import lombok.Data;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @Type
@@ -22,4 +26,9 @@ public class BidBeautyRecord {
     private String payTime;
     private String shopId;
     private Integer remainNum;
+    public void setPayTime(Date payTime) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateTime = dateFormat.format(payTime);
+        this.payTime = dateTime;
+    }
 }

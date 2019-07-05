@@ -1,4 +1,4 @@
-package top.lin.biscashrecord.controller;
+package top.lin.bis.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date 2019/7/5
  */
 @RestController
-public class BisCashRecordController {
+public class BisBagRecordController {
 
 }

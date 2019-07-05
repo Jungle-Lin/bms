@@ -1,4 +1,4 @@
-package top.lin.bisbeautyrecord.service;
+package top.lin.bis.service;
 
 /**
  * @Type

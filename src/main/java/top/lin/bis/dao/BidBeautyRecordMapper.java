@@ -1,4 +1,4 @@
-package top.lin.biscashrecord.dao;
+package top.lin.bis.dao;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -8,5 +8,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @Date 2019/7/5
  */
 @Mapper
-public interface BisCashRecordMapper {
+public interface BidBeautyRecordMapper {
 }

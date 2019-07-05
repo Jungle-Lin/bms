@@ -1,4 +1,4 @@
-package top.lin.biscashrecord.service;
+package top.lin.bis.service;
 
 /**
  * @Type
