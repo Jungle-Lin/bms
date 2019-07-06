@@ -143,6 +143,11 @@ public class BisShop implements Serializable {
     private String modifyUserId;
 
 
+    /**
+     * 获取店铺店主的信息
+     */
+    private BisShopUser bisShopUser;
+
 
 
     public void setCreateTime(Date createTime) {
