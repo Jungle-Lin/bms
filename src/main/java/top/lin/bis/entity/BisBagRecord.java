@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @Type
+ * @Type 礼包记录
  * @Author ysj
  * @Date 2019/7/5
  */
@@ -29,19 +29,28 @@ public class BisBagRecord {
     private String status;
     private String receiveStatus;
 
+    /**
+     * 时间格式化
+     * @param createTime
+     */
     public void setCreateTime(Date createTime) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateTime = dateFormat.format(createTime).toString();
         this.createTime = dateTime;
     }
 
-
+    /**
+     * @param shareTime
+     */
     public void setShareTime(Date shareTime) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateTime = dateFormat.format(shareTime).toString();
         this.shareTime = dateTime;
     }
 
+    /**
+     * @param bagTime
+     */
     public void setBagTime(Date bagTime) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateTime = dateFormat.format(bagTime).toString();
