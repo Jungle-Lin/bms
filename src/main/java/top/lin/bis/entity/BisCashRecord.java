@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @Type
+ * @Type 现金流水
  * @Author ysj
  * @Date 2019/7/5
  */
@@ -22,7 +22,10 @@ public class BisCashRecord {
     private String cashType;
     private String payTime;
 
-
+    /**
+     * 时间格式化
+     * @param payTime
+     */
     public void setPayTime(Date payTime) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateTime = dateFormat.format(payTime);
