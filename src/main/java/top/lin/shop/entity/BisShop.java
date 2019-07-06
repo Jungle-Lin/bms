@@ -155,6 +155,7 @@ public class BisShop implements Serializable {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateTime = dateFormat.format(createTime);
         this.createTime = dateTime;
+
     }
 
     public void setModifyTime(Date modifyTime) {
