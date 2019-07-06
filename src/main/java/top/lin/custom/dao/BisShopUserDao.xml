@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.lin.custom.dao.BisShopUserDao">
+    <resultMap id="bis" type="BisShopUser">
+            <id property="shopUserId" column="shop_user_id"></id>
+            <result property="userType" column="user_type"></result>
+            <result property="shopId" column="shop_id"></result>
+            <result property="account" column="account"></result>
+            <result property="username" column="username"></result>
+            <result property="password" column="password"></result>
+            <result property="photo" column="photo"></result>
+            <result property="workNumber" column="work_number"></result>
+            <result property="sex" column="sex"></result>
+            <result property="postCode" column="post_code"></result>
+            <result property="entryDate" column="entry_date"></result>
+            <result property="mobile" column="mobile"></result>
+            <result property="phone" column="phone"></result>
+            <result property="email" column="email"></result>
+            <result property="bornDate" column="born_date"></result>
+            <result property="idno" column="idno"></result>
+            <result property="address" column="address"></result>
+            <result property="linkman" column="linkman"></result>
+            <result property="linkphone" column="linkphone"></result>
+            <result property="status" column="status"></result>
+            <result property="isDel" column="is_del"></result>
+            <result property="remark" column="remark"></result>
+            <result property="createTime" column="create_time"></result>
+            <result property="createUserId" column="create_user_id"></result>
+            <result property="modifyTime" column="modify_time"></result>
+            <result property="modifyUserId" column="modify_user_id"></result>
+    </resultMap>
+    <select id="bisShopUser" resultMap="bis">
+        select * from bis_shop_user;
+    </select>
+</mapper>

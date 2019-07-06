@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.lin.custom.dao.BisShopCustomDao">
+
+    <resultMap id="bis" type="BisShopCustom">
+        <id property="customUserId" column="custom_user_id"></id>
+        <result property="shopId" column="shop_id"></result>
+        <result property="recentTime" column="recent_time"></result>
+        <result property="createTime" column="create_time"></result>
+        <collection property="bisCustomUserList" column="shopId" fetchType="lazy" ofType="bisShopUser" select="top.lin.custom.dao.BisShopUserDao.bisShobisShopUserpUser">
+        </collection>
+    </resultMap>
+    <select id="bisshopcustom" resultMap="bis">
+        select * from bis_shop_custom;
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+        <!--<resultMap id="rm_sds" type="asdf">-->
+
+        <!--<collection property="bisCustomUserList" column="id" fetchType="lazy" ofType="BisCustomUser" select=""-->
+        <!--</resultMap>-->
+        <!--private String customUserId;-->
+        <!--private String shopId;-->
+        <!--private Date recentTime;-->
+        <!--private Date createTime;-->
+        <!--private List<BisCustomUser> bisCustomUserList;-->

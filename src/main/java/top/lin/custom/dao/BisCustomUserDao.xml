@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.lin.custom.dao.BisCustomUserDao">
+    <resultMap id="bis" type="BisCustomUser">
+        <id property="customUserId" column="custom_user_id"></id>
+        <result property="mobile" column="mobile"></result>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="nikename" column="nikename"></result>
+        <result property="openid" column="openid"></result>
+        <result property="unionid" column="unionid"></result>
+        <result property="wechat" column="wechat"></result>
+        <result property="photo" column="photo"></result>
+        <result property="sex" column="sex"></result>
+        <result property="phone" column="phone"></result>
+        <result property="qq" column="qq"></result>
+        <result property="email" column="email"></result>
+        <result property="bornDate" column="born_date"></result>
+        <result property="idno" column="idno"></result>
+        <result property="address" column="address"></result>
+        <result property="remark" column="remark"></result>
+        <result property="enrollMode" column="enroll_mode"></result>
+        <result property="enrollTime" column="enroll_time"></result>
+        <result property="isDel" column="is_del"></result>
+        <result property="wechatStatus" column="wechat_status"></result>
+        <result property="beautyNum" column="beauty_num"></result>
+        <result property="bagNum" column="bag_num"></result>
+        <association property="bisShopCustom" column="custom_user_id" fetchType="lazy"
+                     javaType="top.lin.custom.entity.BisShopCustom" select="top.lin.custom.dao.BisShopCustomDao.bisshopcustom">
+        </association>
+    </resultMap>
+    <select id="biscustomuser" resultMap="bis">
+     select photo,bis_custom_user.custom_user_id,mobile,username,nikename,sex,shop_name,wechat_status,qq,email,born_date,recent_time,enroll_mode
+    FROM bis_custom_user,bis_shop_custom,bis_shop WHERE bis_custom_user.custom_user_id = bis_shop_custom.custom_user_id AND bis_shop_custom.shop_id = bis_shop.shop_id;
+    </select>
+</mapper>
