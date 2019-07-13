@@ -64,7 +64,7 @@ public class BisShop implements Serializable {
     /**
      * 排序号
      */
-    private Long sortNo;
+    private Integer sortNo;
 
     /**
      * 店铺地址
@@ -148,19 +148,21 @@ public class BisShop implements Serializable {
      */
     private BisShopUser bisShopUser;
 
+//    private List<BisBeautyRecord> bisBeautyRecordList;
 
 
-    public void setCreateTime(Date createTime) {
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateTime = dateFormat.format(createTime);
-        this.createTime = dateTime;
-
-    }
-
-    public void setModifyTime(Date modifyTime) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateTime = dateFormat.format(modifyTime);
-        this.modifyTime = dateTime;
-    }
+//    public void setCreateTime(Date createTime) {
+//
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        String dateTime = dateFormat.format(createTime);
+//        this.createTime = dateTime;
+//
+//    }
+//
+//    public void setModifyTime(Date modifyTime) {
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        String dateTime = dateFormat.format(modifyTime);
+//        this.modifyTime = dateTime;
+//    }
 }
