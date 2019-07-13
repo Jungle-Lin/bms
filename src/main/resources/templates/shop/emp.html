@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工列表</title>
+    <link href="/webjars/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/css/bootstrap-table.min.css" rel="stylesheet"/>
+    <link href="/css/font-awesome.css" rel="stylesheet"/>
+    <script src="/webjars/jquery/3.4.1/jquery.min.js" type="text/javascript"></script>
+    <script src="/webjars/bootstrap/3.4.1/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/js/bootstrap-table.min.js" type="text/javascript"></script>
+    <script src="/js/bootstrap-table-zh-CN.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#table").bootstrapTable({
+                url: "shopUser/getPage1", //访问路径  获取数据的路径
+                pageSize: 20, // 页面数据条数
+                sidePagination: 'server', // 设置为服务器端分页  client 客户端分页
+                cache: false, // 设置为 false 禁用 AJAX 数据缓存， 默认为true
+                striped: true, //表格显示条纹，默认为false
+                pagination: true, // 在表格底部显示分页组件，默认false
+                toolbar: "#toolbar", //使用下方自定义的工具栏
+                pageList: [10, 20, 30, 40, 50], // 设置页面可以显示的数据条数
+                queryParams: queryParams,
+                onClickRow: function (row, $element) {
+                    console.log("click:" + row.shopUserId);
+                    $("#shop_userid").val(row.shopUserId);
+                    $('.info').removeClass('info');//移除class
+                    $($element).addClass('info');//添加class
+                },
+                columns: [
+                    {
+                        field: 'account',
+                        title: '员工账号',
+                        width: 130,
+                        align: "center",
+                        valign: "middle",
+                    }, {
+                        field: 'username', // 返回json数据中的checkid
+                        title: '姓名', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle' // 上下居中
+                    },
+                    {
+                        field: 'sex', // 返回json数据中的ename
+                        title: '性别', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle', // 上下居中
+                        formatter: function (value, row, index) { //value代表当前单元格中的值 row代表当前行, index代表当前行的下标
+                            if (value == 1) {
+                                return "<p readonly='readonly'>男</p>"
+                            } else if (value == 2) {
+                                return "<p readonly='readonly'>女</p>"
+                            } else if (value == 0) {
+                                return "<p readonly='readonly'>保密</p>"
+                            }
+                        } //自定义字段
+                    }, {
+                        field: 'workNumber', // 返回json数据中的cause
+                        title: '工号', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle' // 上下居中
+                    }, {
+                        field: 'shopName', // 返回json数据中的type
+                        title: '店铺名称', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle' // 上下居中
+                    }, {
+                        field: 'postName', // 返回json数据中的name
+                        title: '职位', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle' // 上下居中
+                    }, {
+                        field: 'mobile', // 返回json数据中的name
+                        title: '手机', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle' // 上下居中
+                    }, {
+                        field: 'idno', // 返回json数据中的name
+                        title: '身份证', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle' // 上下居中
+                    }, {
+                        field: '', // 返回json数据中的name
+                        title: '销售收入', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle' // 上下居中
+                    }, {
+                        field: '', // 返回json数据中的name
+                        title: '手工收入', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle' // 上下居中
+                    }, {
+                        field: 'status', // 返回json数据中的idCard
+                        title: '状态', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle', // 上下居中
+                        formatter: function (value, row, index) { //value代表当前单元格中的值 row代表当前行, index代表当前行的下标
+                            if (value == 1) {
+                                return "<p readonly='readonly'>在职</p>"
+                            } else if (value == 0) {
+                                return "<p readonly='readonly'>离职</p>"
+                            }
+                        } //自定义字段
+                    }, {
+                        field: 'entryDate', // 返回json数据中的idCard
+                        title: '入职时间', // 表格表头显示文字
+                        align: 'center', // 左右居中
+                        valign: 'middle', // 上下居中
+                    }]
+            })
+
+            $.ajax({
+                type: "POST",
+                url: "sys/getById?dicValue=员工状态",
+                dataType: "json",
+                success: function (da) {
+                    console.log(da);
+                    var data = da.sysDictionaries;
+                    for (var i = 0; i < data.length; i++) {
+                        $("#statusList").append("<li><a href='#' class='perstatus'>" + data[i].dicValue + "</a></li>");
+                        $("#add_status").append("<option type='radio' value='" + data[i].dicCode + "'>" + data[i].dicValue + "</option>")
+                        $("#update_status").append("<option type='radio' value='" + data[i].dicCode + "'>" + data[i].dicValue + "</option>")
+                    }
+                }
+            });
+
+            $('input[type="number"]').keyup(function (e) {
+                var float = parseFloat($(this).attr('data-float'));
+
+                /* 2 regexp for validating integer and float inputs *****
+                    > integer_regexp : allow numbers, but do not allow leading zeros
+                    > float_regexp : allow numbers + only one dot sign (and only in the middle of the string), but do not allow leading zeros in the integer part
+                *************************************************************************/
+                var integer_regexp = (/[^0-9]|^0+(?!$)/g);
+                var float_regexp = (/[^0-9\.]|^\.+(?!$)|^0+(?=[0-9]+)|\.(?=\.|.+\.)/g);
+
+                var regexp = (float % 1 === 0) ? integer_regexp : float_regexp;
+                if (regexp.test(this.value)) {
+                    this.value = this.value.replace(regexp, '');
+                }
+            });
+
+            $("#statusList").on({
+                    "click": function () {
+                        console.log("我被调用了");
+                        $('#status').val($(this).text());
+                    }
+                }
+                , ".perstatus")
+
+            $("#postlist").on({
+                    "click": function () {
+                        console.log("我被调用了");
+                        $('#postName').val($(this).text());
+                    }
+                }
+                , ".perpost")
+
+            $("#selectByMany").click(function () {
+                $("#table").bootstrapTable("refresh");
+            })
+
+            $.ajax({
+                type: "POST",
+                url: "post/getAll",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data.responseList);
+                    var datalist = data.responseList;
+                    for (var i = 0; i < datalist.length; i++) {
+                        $("#postlist").append("<li><a href='#' class='perpost'>" + datalist[i].postName + "</a></li>");
+                        $("#add_post").append("<option type='radio' value='" + datalist[i].postCode + "'>" + datalist[i].postName + "</option>")
+                        $("#update_post").append("<option type='radio' value='" + datalist[i].postCode + "'>" + datalist[i].postName + "</option>")
+                    }
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "shop/getAll",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data.responseList);
+                    var datalist = data.responseList;
+                    for (var i = 0; i < datalist.length; i++) {
+                        $("#shoplist").append("<li><a href='#' class='pershop'>" + datalist[i].shopName + "</a></li>");
+                        $("#add_shop").append("<option type='radio' value='" + datalist[i].shopId + "'>" + datalist[i].shopName + "</option>")
+                        $("#update_shop").append("<option type='radio' value='" + datalist[i].shopId + "'>" + datalist[i].shopName + "</option>")
+                    }
+                }
+            });
+
+            $("#shoplist").on({
+                    "click": function () {
+                        console.log("我被调用了");
+                        $('#shopName').val($(this).text());
+                    }
+                }
+                , ".pershop")
+
+            // //弹出框提示
+            $("[data-toggle='popover']").popover();
+            $("[data-toggle='tooltip']").tooltip();
+
+            $('.popover-hide').mouseover(function () {
+                if ($('.popover-hide').val() != "" && $('.popover-hide').val() != null) {
+                    var account = $('.popover-hide').val();
+                    $.ajax({
+                        type: "POST",
+                        url: "shopUser/findByAccount?account=" + account,
+                        dataType: "json",
+                        success: function (data) {
+                            console.log(data);
+                            if (data.status == 'error') {
+                                $('.popover-hide').attr('title', data.responseResult);
+                                $('.popover-hide').popover('show')
+                                return false;
+                            }
+                        }
+                    });
+                    $('.popover-hide').popover('destroy');
+                } else {
+                    $('.popover-hide').popover('show')
+                }
+            })
+            $('.popover-hide').mouseout(function () {
+                $('.popover-hide').popover('hide');
+            })
+            $('.popover-hide').change(function () {
+                $('.popover-hide').popover('destroy')
+                $('.popover-hide').css("background-color", "#ffffff");
+            })
+
+            $('.popover-hide2').mouseover(function () {
+                if ($('.popover-hide2').val() != "" && $('.popover-hide2').val() != null) {
+                    $('.popover-hide2').popover('destroy');
+                } else {
+                    $('.popover-hide2').popover('show')
+                }
+            })
+            $('.popover-hide2').mouseout(function () {
+                $('.popover-hide2').popover('hide');
+            })
+            $('.popover-hide2').change(function () {
+                $('.popover-hide2').popover('destroy')
+                $('.popover-hide2').css("background-color", "#ffffff");
+            })
+
+            $('#add_idno').mouseover(function () {
+                if ($('#add_idno').val() != "" && $('#add_idno').val() != null) {
+                    var regIdCard = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
+                    var idno = $('#add_idno').val();
+                    if (!regIdCard.test(idno)) {
+                        $('#add_idno').attr('title', '身份证格式不正确');
+                        $('#add_idno').popover('show')
+                        return false;
+                    }
+                    $('#add_idno').popover('destroy');
+                } else {
+                    $('#add_idno').popover('show')
+                }
+            })
+            $('#add_idno').mouseout(function () {
+                $('#add_idno').popover('hide');
+            })
+            $('#add_idno').change(function () {
+                $('#add_idno').popover('destroy')
+                $('#add_idno').css("background-color", "#ffffff");
+            })
+
+            $('#add_mobile').mouseover(function () {
+                if ($('#add_mobile').val() != "" && $('#add_mobile').val() != null) {
+                    var mobile = $('#add_mobile').val();
+                    if (!(/^1[3456789]\d{9}$/.test(mobile))) {
+                        $('#add_mobile').attr('title', '手机格式不正确');
+                        $('#add_mobile').popover('show')
+                        return false;
+                    }
+                    $('#add_mobile').popover('destroy');
+                } else {
+                    $('#add_mobile').popover('show')
+                }
+            })
+            $('#add_mobile').mouseout(function () {
+                $('#add_mobile').popover('hide');
+            })
+            $('#add_mobile').change(function () {
+                $('#add_mobile').popover('destroy')
+                $('#add_mobile').css("background-color", "#ffffff");
+            })
+
+            $('#add_shop').mouseover(function () {
+                if ($('#add_shop').val() != "" && $('#add_shop').val() != null) {
+                    $('#add_shop').popover('destroy');
+                } else {
+                    $('#add_shop').popover('show')
+                }
+            })
+            $('#add_shop').mouseout(function () {
+                $('#add_shop').popover('hide');
+            })
+            $('#add_shop').change(function () {
+                $('#add_shop').popover('destroy')
+                $('#add_shop').css("background-color", "#ffffff");
+            })
+
+            $('#add_post').mouseover(function () {
+                if ($('#add_post').val() != "" && $('#add_post').val() != null) {
+                    $('#add_post').popover('destroy');
+                } else {
+                    $('#add_post').popover('show')
+                }
+            })
+            $('#add_post').mouseout(function () {
+                $('#add_post').popover('hide');
+            })
+            $('#add_post').change(function () {
+                $('#add_post').popover('destroy')
+                $('#add_post').css("background-color", "#ffffff");
+            })
+
+            $('#confirmPwd').mouseover(function () {
+                if ($('#confirmPwd').val() != "" && $('#confirmPwd').val() != null) {
+                    $('#confirmPwd').popover('destroy');
+                } else {
+                    $('#confirmPwd').popover('show')
+                }
+            })
+            $('#confirmPwd').mouseout(function () {
+                $('#confirmPwd').popover('hide');
+            })
+            $('#confirmPwd').change(function () {
+                $('#confirmPwd').popover('destroy')
+                $('#confirmPwd').css("background-color", "#ffffff");
+            })
+
+            $('#add_password').mouseover(function () {
+                if ($('#add_password').val() != "" && $('#add_password').val() != null) {
+                    $('#add_password').popover('destroy');
+                } else {
+                    $('#add_password').popover('show')
+                }
+            })
+            $('#add_password').mouseout(function () {
+                $('#add_password').popover('hide');
+            })
+            $('#add_password').change(function () {
+                $('#add_password').popover('destroy')
+                $('#add_password').css("background-color", "#ffffff");
+            })
+
+            $('#add_number').mouseover(function () {
+                if ($('#add_number').val() != "" && $('#add_number').val() != null) {
+                    $('#add_number').popover('destroy');
+                } else {
+                    $('#add_number').popover('show')
+                }
+            })
+            $('#add_number').mouseout(function () {
+                $('#add_number').popover('hide');
+            })
+            $('#add_number').change(function () {
+                $('#add_number').popover('destroy')
+                $('#add_number').css("background-color", "#ffffff");
+            })
+
+            $('#add_name').mouseover(function () {
+                if ($('#add_name').val() != "" && $('#add_name').val() != null) {
+                    $('#add_name').popover('destroy');
+                } else {
+                    $('#add_name').popover('show')
+                }
+            })
+            $('#add_name').mouseout(function () {
+                $('#add_name').popover('hide');
+            })
+            $('#add_name').change(function () {
+                $('#add_name').popover('destroy')
+                $('#add_name').css("background-color", "#ffffff");
+            })
+
+            $("#add_email").change(function () {
+                var email = $("#add_email").val()
+                var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+                if (!myreg.test(email)) {
+                    $('#phone').popover('show');
+                    return false;
+                } else {
+                    $('#phone').popover('destroy')
+                }
+            })
+
+            $('#add_email').mouseover(function () {
+                var email = $("#add_email").val()
+                var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+                if (myreg.test(email)) {
+                    $('#add_email').popover('destroy');
+                } else {
+                    $('#add_email').popover('show')
+                }
+            })
+            $('#add_email').mouseout(function () {
+                $('#add_email').popover('hide');
+            })
+
+            $.ajax({
+                type: "POST",
+                url: "sys/getById?dicValue=性别",
+                dataType: "json",
+                success: function (da) {
+                    console.log(da);
+                    var data = da.sysDictionaries;
+                    for (var i = 0; i < data.length; i++) {
+                        $("#addSexList").append("<option type='radio' value='" + data[i].dicCode + "'>" + data[i].dicValue + "</option>")
+                        $("#update_sex").append("<option type='radio' value='" + data[i].dicCode + "'>" + data[i].dicValue + "</option>")
+                    }
+                }
+            });
+
+            $("#confirmupdate").click(function () {
+                var oldpassword = $('#oldpassword').val();
+                var oldpwd = $('#oldpwd').val();
+                var newpwd = $('#newpassword').val();
+                var confirmpwd = $('#confirmpassword').val();
+                var shopUserId = $('#update_userid').val();
+                console.log(newpwd);
+                console.log(confirmpwd);
+                if (oldpassword == "") {
+                    $("#tishi3").val("原密码不能为空");
+                    $("#suggest3").show();
+                    return false;
+                } else if (oldpassword != oldpwd) {
+                    $("#tishi3").val("原密码不正确，请重新输入");
+                    $("#suggest3").show();
+                    return false;
+                } else if (newpwd == '') {
+                    $("#tishi3").val("新密码不能为空");
+                    $("#suggest3").show();
+                    return false;
+                } else if (confirmpwd == '') {
+                    $("#tishi3").val("确认新密码不能为空");
+                    $("#suggest3").show();
+                    return false;
+                } else if (confirmpwd != newpwd) {
+                    $("#tishi3").val("两次输入密码不一致，请重新输入");
+                    $("#suggest3").show();
+                    return false;
+                } else {
+                    var form = $("#updatePwdForm").serialize();
+                    $.ajax({
+                        type: "post",
+                        url: "shopUser/updatePwd",
+                        dataType: "json",
+                        data: form,
+                        success: function (data) {
+                            console.log(data);
+                            $("#updatePwdModal").modal("hide");
+                            $("#table").bootstrapTable("refresh");
+                        }
+                    })
+                }
+            })
+
+        })
+
+        function queryParams(params) {
+            var status = 1;
+            if ($('#status').val() == '在职') {
+                // alert(1)
+                status = 1;
+            } else if ($('#status').val() == '离职') {
+                // alert(0);
+                status = 0;
+            }
+            return {
+                account: $("#account").val(),
+                shopName: $("#shopName").val(),
+                postName: $("#postName").val(),
+                limit: params.limit,
+                offset: params.offset,
+                status: status,
+                username: $("#username").val(),
+                mobile: $("#mobile").val(),
+                idno: $("#idno").val(),
+                workNumber: $("#workNumber").val(),
+            }
+        }
+
+        function deleteEmp() {
+            var shopUserId = $("#shop_userid").val();
+            // alert(shopId);
+            if (shopUserId == null || shopUserId == "") {
+                $("#myModal").modal("show");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "shopUser/deleteByShopUserId?shopUserId=" + shopUserId,
+                    success: function (data) {
+                        console.log(data)
+                        $("#table").bootstrapTable("refresh");
+                    }
+                });
+            }
+        }
+
+        function updatePwd() {
+            var shopUserId = $("#shop_userid").val();
+            // alert(shopId);
+            if (shopUserId == null || shopUserId == "") {
+                $("#myModal1").modal("show");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "shopUser/getByShopUserId?shopUserId=" + shopUserId,
+                    success: function (data) {
+                        console.log(data);
+                        $('#oldpwd').val(data.password);
+                        $('#update_userid').val(data.shopUserId);
+                        $("#updatePwdModal").modal("show");
+                    }
+                });
+            }
+        }
+
+        function updateInfo() {
+            var shopUserId = $("#shop_userid").val();
+            // alert(shopId);
+            if (shopUserId == null || shopUserId == "") {
+                $("#myModal2").modal("show");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "shopUser/getByShopUserId?shopUserId=" + shopUserId,
+                    success: function (data) {
+                        console.log(data);
+                        $("#update_account").val(data.account);
+                        oldaccount = data.account;
+                        $("#update_username").val(data.username);
+                        $("#update_number").val(data.workNumber);
+                        $("#update_shop").val(data.shopId);
+                        $("#update_post").val(data.postCode);
+                        if (data.postCode == '01') {
+                            $('#update_type').val('1');
+                        } else {
+                            $('#update_type').val('2');
+                        }
+                        $("#update_borndate").val(data.bornDate);
+                        $("#update_entrydate").val(data.entryDate);
+                        $("#update_linkman").val(data.linkman);
+                        $("#update_linkphone").val(data.linkphone);
+                        $("#update_address").val(data.address);
+                        $("#update_password").val(data.password);
+                        $("#update_mobile").val(data.mobile);
+                        $("#update_idno").val(data.idno);
+                        $("#update_phone").val(data.phone);
+                        $("#update_email").val(data.email);
+                        $("#update_sex").val(data.sex);
+                        $("#update_status").val(data.status);
+                        $("#update_remark").val(data.remark);
+                        $("#update_shopUserId").val(data.shopUserId);
+                        $('#update_photo').val(data.photo);
+                        $("#updateInfoModel").modal("show");
+                        $('#images2').css("background-image", "url(" + data.photo + ")");
+                    }
+                });
+            }
+        }
+
+        var oldaccount = "";
+
+        function updateUser() {
+            var account = $('#update_account').val();
+            var username = $('#update_username').val();
+            var workNumber = $('#update_number').val();
+            var newpwd = $('#update_password').val();
+            var shopId = $('#update_shop').val();
+            var mobile = $('#update_mobile').val();
+            var idno = $('#update_idno').val();
+            var postCode = $('#update_post').val();
+            console.log(idno);
+            var status = $('#update_status').val();
+            if (account != oldaccount) {
+                $.ajax({
+                    type: "POST",
+                    url: "shopUser/findByAccount?account=" + account,
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        if (data.status == 'error') {
+                            $("#tishi2").val(data.responseResult);
+                            $("#suggest2").show();
+                        }
+                    }
+                });
+            }
+            if (status == '' || status == null) {
+                $('#update_status').val('1');
+            }
+            if (postCode == '01') {
+                $('#update_type').val('1');
+                // $('#add_shop').val(null);
+            } else if (postCode != '01') {
+                $('#update_type').val('2');
+            }
+            if (account == "") {
+                $("#tishi2").val("员工账号为必填");
+                $("#suggest2").show();
+            } else if (username == "") {
+                $("#tishi2").val("姓名为必填");
+                $("#suggest2").show();
+            } else if (workNumber == "") {
+                $("#tishi2").val("工号为必填");
+                $("#suggest2").show();
+            } else if (newpwd == "") {
+                $("#tishi2").val("密码为必填");
+                $("#suggest2").show();
+            } else if (shopId == "") {
+                $("#tishi2").val("店铺名称为必填");
+                $("#suggest2").show();
+            } else if (postCode == "") {
+                $("#tishi2").val("职位为必填");
+                $("#suggest2").show();
+            } else if (mobile == "") {
+                $("#tishi2").val("手机号为必填");
+                $("#suggest2").show();
+            } else if (!(/^1[3456789]\d{9}$/.test(mobile))) {
+                $("#tishi2").val("手机格式不正确");
+                $("#suggest2").show();
+            } else if (idno == "") {
+                $("#tishi2").val("身份证为必填");
+                $("#suggest2").show();
+            } else if (!(/^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/.test(idno))) {
+                $("#tishi2").val("身份证格式不正确");
+                $("#suggest2").show();
+            } else {
+                var form = $("#updateForm").serialize();
+                $.ajax({
+                    type: "POST",
+                    url: "shopUser/updateShopUser",
+                    dataType: "json",
+                    data: form,
+                    success: function (data) {
+                        console.log(data.responseResult);
+                        $("#updateInfoModel").modal("hide");
+                        $("#table").bootstrapTable("refresh");
+                    }
+                });
+            }
+        }
+
+        function addInfo() {
+            $("#addInfoModel").modal("show");
+        }
+
+        function addUser() {
+            var account = $('.popover-hide').val();
+            var username = $('#add_name').val();
+            var workNumber = $('#add_number').val();
+            var newpwd = $('#add_password').val();
+            var confirmpwd = $('#confirmPwd').val();
+            var shopId = $('#add_shop').val();
+            var mobile = $('#add_mobile').val();
+            var idno = $('#add_idno').val();
+            var postCode = $('#add_post').val();
+            console.log(idno);
+            var status = $('#add_status').val();
+            $.ajax({
+                type: "POST",
+                url: "shopUser/findByAccount?account=" + account,
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    if (data.status == 'error') {
+                        $("#tishi").val(data.responseResult);
+                        $("#suggest").show();
+                    }
+                }
+            });
+            if (status == '' || status == null) {
+                $('#add_status').val('1');
+            }
+            if (postCode == '01') {
+                $('#add_type').val('1');
+                // $('#add_shop').val(null);
+            } else if (postCode != '01') {
+                $('#add_type').val('2');
+            }
+            if (account == "") {
+                $("#tishi").val("员工账号为必填");
+                $("#suggest").show();
+            } else if (username == "") {
+                $("#tishi").val("姓名为必填");
+                $("#suggest").show();
+            } else if (workNumber == "") {
+                $("#tishi").val("工号为必填");
+                $("#suggest").show();
+            } else if (newpwd == "") {
+                $("#tishi").val("密码为必填");
+                $("#suggest").show();
+            } else if (confirmpwd == "") {
+                $("#tishi").val("确认密码为必填");
+                $("#suggest").show();
+            } else if (confirmpwd != newpwd) {
+                $("#tishi").val("两次密码输入不一致，请检查");
+                $("#suggest").show();
+            } else if (shopId == "") {
+                $("#tishi").val("店铺名称为必填");
+                $("#suggest").show();
+            } else if (postCode == "") {
+                $("#tishi").val("职位为必填");
+                $("#suggest").show();
+            } else if (mobile == "") {
+                $("#tishi").val("手机号为必填");
+                $("#suggest").show();
+            } else if (!(/^1[3456789]\d{9}$/.test(mobile))) {
+                $("#tishi").val("手机格式不正确");
+                $("#suggest").show();
+            } else if (idno == "") {
+                $("#tishi").val("身份证为必填");
+                $("#suggest").show();
+            } else if (!(/^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/.test(idno))) {
+                $("#tishi").val("身份证格式不正确");
+                $("#suggest").show();
+            } else {
+                var form = $("#addForm").serialize();
+                $.ajax({
+                    type: "POST",
+                    url: "shopUser/addShopUser",
+                    dataType: "json",
+                    data: form,
+                    success: function (data) {
+                        console.log(data)
+                        $("#addInfoModel").modal("hide");
+                        $("#table").bootstrapTable("refresh");
+                    }
+                });
+            }
+
+
+        }
+
+        function selectfile1() {
+            $("#headimage").trigger("click");
+        }
+
+        function selectfile2() {
+            $("#headimage2").trigger("click");
+        }
+
+        function doUpload1() {
+            var form = new FormData($("#addForm")[0]);
+            form.append("oldImage", null);
+            $.ajax({
+                type: "post",
+                url: "/file/uploadImage",
+                contentType: false,
+                processData: false,
+                data: form,
+                success: function (response) {
+                    console.log(response);
+                    alert("上传头像成功");
+                    $('#add_photo').val(response.responseResult);
+                    $('#images').css("background-image", "url(" + response.responseResult + ")");
+                }
+            });
+        }
+
+        function doUpload2() {
+            var form = new FormData($("#updateForm")[0]);
+            form.append("oldImage", $('#update_photo').val());
+            $.ajax({
+                type: "post",
+                url: "/file/uploadImage",
+                contentType: false,
+                processData: false,
+                data: form,
+                success: function (response) {
+                    console.log(response);
+                    alert("上传头像成功");
+                    $('#update_photo').val(response.responseResult);
+                    $('#images2').css("background-image", "url(" + response.responseResult + ")");
+                }
+            });
+        }
+
+        function removeImages() {
+            $("#images").css("background-image", "url()");
+        }
+
+        function removeImages2() {
+            $("#images2").css("background-image", "url()");
+        }
+
+    </script>
+</head>
+<body>
+
+<div class="container" style="margin-top: 3%">
+    <div class="row">
+
+        <form class="form-inline" role="form">
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <label class="input-group-addon">员工账号</label>
+                    <input type="text" class="form-control" id="account">
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <span class="input-group-addon">店铺名称</span>
+                    <input type="text" class="form-control" id="shopName" value=""/>
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default form-control
+                        dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" id="shoplist">
+                        </ul>
+                    </div><!-- /btn-group -->
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;职位&nbsp;&nbsp;&nbsp;</span>
+                    <input type="text" class="form-control" id="postName" value=""/>
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default form-control
+                        dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" id="postlist">
+                        </ul>
+                    </div><!-- /btn-group -->
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;状态&nbsp;&nbsp;&nbsp;</span>
+                    <input type="text" class="form-control" id="status" value=""/>
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default form-control
+                        dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" id="statusList">
+                        </ul>
+                    </div><!-- /btn-group -->
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+
+            <div class="input-group col-sm-10 col-sm-offset-2">
+            </div>
+
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <label class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;姓名&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" class="form-control" id="username">
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <label class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;工号&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" class="form-control" id="workNumber">
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <label class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;手机&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" class="form-control" id="mobile">
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <label class="input-group-addon">&nbsp;&nbsp;身份证&nbsp;</label>
+                    <input type="text" class="form-control" id="idno">
+                </div>
+            </div>
+
+            <div class="input-group col-sm-10 col-sm-offset-2">
+            </div>
+            <div class="form-group col-sm-4">
+                <button type="button" class="btn btn-primary" id="selectByMany">
+                    <i class="fa fa-search" aria-hidden="true" style="width: 15px"></i>
+                    查询
+                </button>&nbsp;&nbsp;&nbsp;&nbsp;
+                <button type="reset" class="btn btn-default">
+                    <i class="fa fa-refresh" aria-hidden="true" style="width: 15px"></i>
+                    重置
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<br/>
+<div class="container">
+    <div class="row">
+        <form class="form-inline bs-example bs-example-form" role="form">
+            <input type="hidden" id="shop_userid" value=""/>
+            <div class="input-group col-sm-10 col-sm-offset-2">
+            </div>
+            <div class="form-group col-sm-4">
+                <button type="button" class="btn btn-primary" onclick="addInfo()">
+                    <i class="fa fa-plus" aria-hidden="true" style="width: 15px"></i>
+                    新增
+                </button>
+                <button type="button" class="btn btn-warning" onclick="updateInfo()">
+                    <i class="fa fa-pencil-square" aria-hidden="true" style="width: 15px"></i>
+                    修改
+                </button>
+                <button type="button" class="btn btn-info" onclick="updatePwd()">
+                    <i class="fa fa-unlock-alt" aria-hidden="true" style="width: 15px"></i>
+                    密码重置
+                </button>
+                <button type="button" class="btn btn-danger" id="del_more" onclick="deleteEmp()">
+                    <i class="fa fa-times" aria-hidden="true" style="width: 15px"></i>
+                    删除
+                </button>
+            </div>
+        </form>
+    </div>
+    <table class="table" id="table">
+    </table>
+</div>
+
+
+<!------------------------------------------修改密码--------------------------------------------------------------------->
+<div class="modal fade" id="updatePwdModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">修改密码</h4>
+            </div>
+            <form class="form-horizontal" role="form" id="updatePwdForm" method="post">
+                <input type="hidden" id="update_userid" value="" name="shopUserId"/>
+                <input type="hidden" id="oldpwd" value=""/>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">当前密码</label>
+                    <div class="col-sm-5">
+                        <input type="password" class="form-control" id="oldpassword"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">新密码</label>
+                    <div class="col-sm-5">
+                        <input type="password" class="form-control" id="newpassword"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">确认新密码</label>
+                    <div class="col-sm-5">
+                        <input type="password" class="form-control" name="password" id="confirmpassword">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" id="confirmupdate">确认修改</button>
+                </div>
+
+                <div class="alert alert-warning" style="display:none;" id="suggest3">
+                    <a href="#" class="close" data-dismiss="alert">
+                        &times;
+                    </a>
+                    <input type="text" class="form-control" disabled id="tishi3"/>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">警告信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="form-group">
+                        <h4>
+                            <i class="fa fa-exclamation-triangle"></i>请选择你要删除的员工信息
+                        </h4>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" style="margin-left: 7%;margin-top: 3%" class="btn btn-default"
+                                data-dismiss="modal">确定
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- 模态框（Modal） -->
+<div class="modal fade bs-example-modal-sm" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">警告信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="form-group">
+                        <h4>
+                            <i class="fa fa-exclamation-triangle"></i>请选择你要重置密码的员工
+                        </h4>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" style="margin-left: 7%;margin-top: 3%" class="btn btn-default"
+                                data-dismiss="modal">确定
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- 模态框（Modal） -->
+<div class="modal fade bs-example-modal-sm" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">警告信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="form-group">
+                        <h4>
+                            <i class="fa fa-exclamation-triangle"></i>请选择你要修改的员工信息
+                        </h4>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" style="margin-left: 7%;margin-top: 3%" class="btn btn-default"
+                                data-dismiss="modal">确定
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<!------------------------------------------修改模态框--------------------------------------------------------------------->
+<div class="modal fade bs-example-modal-lg" id="updateInfoModel" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">修改员工信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container" style="width: 75%">
+                    <form class="bs-example bs-example-form" id="updateForm" role="form" enctype="multipart/form-data">
+                        <input type="hidden" name="userType" value="" id="update_type"/>
+                        <input type="hidden" name="shopUserId" value="" id="update_shopUserId"/>
+                        <input type="hidden" name="photo" value="" id="update_photo"/>
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;员工账号&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control popover-hide2" name="account" id="update_account"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                头像&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+
+                            <div class="text-center" onclick="selectfile2();" id="images2"
+                                 style="width: 100px;height: 100px; border: 1px dashed black; background-size: cover;background-repeat:no-repeat; border-radius: 5px;">
+                                <div class="fa fa-plus" style="margin-top:42%; color:gray;">
+                                </div>
+                            </div>
+                            <span>
+                                    <button type="button" class="btn btn-default" onclick="removeImages2();"
+                                            style="border-spacing: 1em;border-color: #ececf6;">删除该图片
+                                    </button>
+                                </span>
+                            <input id="headimage2" type="file" style="display: none;" name="file"
+                                   onchange="doUpload2()">
+                        </div>
+
+                        <div class="input-group alert alert-danger" style="margin-top: 15px;">
+                            <span>此处建议上传图片大小尺寸：宽度160px，高度120px</span>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                姓名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="username" id="update_username"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                工号&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="number" class="form-control" name="workNumber" id="update_number"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                密码&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="password" class="form-control" id="update_password" name="password"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <!--id="add_sex"-->
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                性别&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <select class="form-control" name="sex" id="update_sex">
+                                <option style="display: none"></option>
+                            </select>
+                        </div>
+
+                        <!--id="add_status"-->
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;用户状态&nbsp;&nbsp;&nbsp;</span>
+                            <select class="form-control" name="status" id="update_status">
+                                <option style="display: none"></option>
+                            </select>
+                        </div>
+
+                        <!--id="add_sex"-->
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;店铺名称&nbsp;&nbsp;&nbsp;</span>
+                            <select class="form-control" name="shopId"
+                                    style="background-color: mistyrose" data-toggle="popover" id="update_shop"
+                                    title="该输入项为必输项">
+                                <option style="display: none"></option>
+                            </select>
+                        </div>
+
+                        <!--id="add_sex"-->
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                职位&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <select class="form-control" name="postCode"
+                                    style="background-color: mistyrose" data-toggle="popover" id="update_post"
+                                    title="该输入项为必输项">
+                                <option style="display: none"></option>
+                            </select>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                手机&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="mobile" id="update_mobile"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                身份证&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="idno" id="update_idno"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                电话&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="phone" id="update_phone"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                邮箱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="email" id="update_email"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;出生日期&nbsp;&nbsp;&nbsp;</span>
+                            <input type="date" class="form-control" name="bornDate" id="update_borndate"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;入职日期&nbsp;&nbsp;&nbsp;</span>
+                            <input type="date" class="form-control" name="entryDate" id="update_entrydate"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;紧急联系人&nbsp;</span>
+                            <input type="text" class="form-control" name="linkman" id="update_linkman"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">紧急联系电话</span>
+                            <input type="number" class="form-control" name="linkphone" id="update_linkphone"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;居住地址&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="address" id="update_address"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                备注&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <textarea class="form-control" name="remark" id="update_remark"></textarea>
+                        </div>
+
+                        <div class="input-group col-sm-offset-5" style="margin-top: 15px;">
+                            <button type="button" class="btn btn-default" onclick="updateUser()">
+                                <i class="fa fa-check-circle" style="width: 15px"></i>
+                                确定
+                            </button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                <i class="fa fa-close" style="width: 15px"></i>
+                                关闭
+                            </button>
+                        </div>
+
+                        <div class="alert alert-warning" style="display:none;" id="suggest2">
+                            <a href="#" class="close" data-dismiss="alert">
+                                &times;
+                            </a>
+                            <input type="text" class="form-control" disabled id="tishi2"/>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+
+
+<!------------------------------------------新增模态框--------------------------------------------------------------------->
+<div class="modal fade bs-example-modal-lg" id="addInfoModel" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">新增员工信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container" style="width: 75%">
+                    <form class="bs-example bs-example-form" id="addForm" role="form" enctype="multipart/form-data">
+                        <input type="hidden" name="userType" value="" id="add_type"/>
+                        <input type="hidden" name="photo" value="" id="add_photo"/>
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;员工账号&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control popover-hide" name="account"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                头像&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+
+                            <div class="text-center" onclick="selectfile1();" id="images"
+                                 style="width: 100px;height: 100px; border: 1px dashed black; background-size: cover;background-repeat:no-repeat; border-radius: 5px;">
+                                <div class="fa fa-plus" style="margin-top:42%; color:gray;">
+                                </div>
+                            </div>
+                            <span>
+                                    <button type="button" class="btn btn-default" onclick="removeImages();"
+                                            style="border-spacing: 1em;border-color: #ececf6;">删除该图片
+                                    </button>
+                                </span>
+                            <input id="headimage" type="file" style="display: none;" name="file"
+                                   onchange="doUpload1()">
+                        </div>
+
+                        <div class="input-group alert alert-danger" style="margin-top: 15px;">
+                            <span>此处建议上传图片大小尺寸：宽度160px，高度120px</span>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                姓名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="username" id="add_name"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                工号&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="number" class="form-control" name="workNumber" id="add_number"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                密码&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="password" class="form-control" id="add_password" name="password"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;确认密码&nbsp;&nbsp;&nbsp;</span>
+                            <input type="password" class="form-control" id="confirmPwd"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <!--id="add_sex"-->
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                性别&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <select class="form-control" name="sex" id="addSexList">
+                                <option style="display: none"></option>
+                            </select>
+                        </div>
+
+                        <!--id="add_status"-->
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;用户状态&nbsp;&nbsp;&nbsp;</span>
+                            <select class="form-control" name="status" id="add_status">
+                                <option style="display: none"></option>
+                            </select>
+                        </div>
+
+                        <!--id="add_sex"-->
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;店铺名称&nbsp;&nbsp;&nbsp;</span>
+                            <select class="form-control" name="shopId"
+                                    style="background-color: mistyrose" data-toggle="popover" id="add_shop"
+                                    title="该输入项为必输项">
+                                <option style="display: none"></option>
+                            </select>
+                        </div>
+
+                        <!--id="add_sex"-->
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                职位&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <select class="form-control" name="postCode"
+                                    style="background-color: mistyrose" data-toggle="popover" id="add_post"
+                                    title="该输入项为必输项">
+                                <option style="display: none"></option>
+                            </select>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                手机&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="mobile" id="add_mobile"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                身份证&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="idno" id="add_idno"
+                                   style="background-color: mistyrose" data-toggle="popover" title="该输入项为必输项"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                电话&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="phone"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                邮箱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="email"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;出生日期&nbsp;&nbsp;&nbsp;</span>
+                            <input type="date" class="form-control" name="bornDate"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;入职日期&nbsp;&nbsp;&nbsp;</span>
+                            <input type="date" class="form-control" name="entryDate"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;紧急联系人&nbsp;</span>
+                            <input type="text" class="form-control" name="linkman"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">紧急联系电话</span>
+                            <input type="number" class="form-control" name="linkphone"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;居住地址&nbsp;&nbsp;&nbsp;</span>
+                            <input type="text" class="form-control" name="address"/>
+                        </div>
+
+                        <div class="input-group" style="margin-top: 15px;">
+                            <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                备注&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <textarea class="form-control" name="remark"></textarea>
+                        </div>
+
+                        <div class="input-group col-sm-offset-5" style="margin-top: 15px;">
+                            <button type="button" class="btn btn-default" onclick="addUser()">
+                                <i class="fa fa-check-circle" style="width: 15px"></i>
+                                确定
+                            </button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                <i class="fa fa-close" style="width: 15px"></i>
+                                关闭
+                            </button>
+                        </div>
+
+                        <div class="alert alert-warning" style="display:none;" id="suggest">
+                            <a href="#" class="close" data-dismiss="alert">
+                                &times;
+                            </a>
+                            <input type="text" class="form-control" disabled id="tishi"/>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+
+</body>
+</html>
