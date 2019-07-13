@@ -3,7 +3,513 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="top.lin.shop.dao.BisShopMapper">
-    <select id="getAllBisShops" resultType="bisShop">
+    <select id="getAllBisShops" resultMap="bis">
         select * from bis_shop
     </select>
+
+    <resultMap id="bis" type="bisShop">
+        <id property="shopId" column="shop_id"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="shopName" column="shop_name"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="monthCashIn" column="month_cash_in"/>
+        <result property="monthExpendIn" column="month_expend_in"/>
+        <result property="shopImage" column="shop_image"/>
+        <result property="shopDetailImage" column="shop_detail_image"/>
+        <result property="gpsX" column="gps_x"/>
+        <result property="gpsY" column="gps_y"/>
+        <result property="sortNo" column="sort_no"/>
+        <result property="shopAddress" column="shop_address"/>
+        <result property="shopQrcode" column="shop_qrcode"/>
+        <result property="shopPhone" column="shop_phone"/>
+        <result property="shopArea" column="shop_area"/>
+        <result property="shopProject" column="shop_project"/>
+        <result property="shopType" column="shop_type"/>
+        <result property="shopIntro" column="shop_intro"/>
+        <result property="shortName" column="short_name"/>
+        <result property="shopLicense" column="shop_license"/>
+        <result property="shopPhone" column="shop_phone"/>
+        <result property="showStatus" column="show_status"/>
+        <result property="isDel" column="is_del"/>
+        <result property="shopRemark" column="shop_remark"/>
+        <result property="beginTime" column="begin_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createUserId" column="create_user_id"/>
+        <result property="modifyUserId" column="modify_user_id"/>
+        <result property="modifyTime" column="modify_time"/>
+        <association property="bisShopUser" column="owner_id" javaType="top.lin.shop.entity.BisShopUser"
+                     select="top.lin.shop.dao.BisShopUserMapper.getById" fetchType="eager"></association>
+    </resultMap>
+
+    <!-- 根据主键删除数据持久化对象 -->
+    <delete id="deleteShopByShopId" parameterType="String">
+        update bis_shop set is_del= 1 WHERE shop_id = #{value}
+    </delete>
+
+    <select id="listShop" resultMap="bis" parameterType="shopPage">
+        select *
+        from bis_shop,bis_shop_user
+        where bis_shop.owner_id = bis_shop_user.shop_user_id
+        AND bis_shop_user.user_type = 1 AND bis_shop.is_del = 0 AND bis_shop_user.is_del = 0
+        <include refid="like"/>
+        limit #{offset},#{limit}
+    </select>
+
+    <select id="getTotal" resultType="Integer" parameterType="shopPage">
+        select count(1) from
+        bis_shop,bis_shop_user
+        where bis_shop.owner_id = bis_shop_user.shop_user_id
+        AND bis_shop_user.user_type = 1 AND bis_shop.is_del = 0 AND bis_shop_user.is_del = 0
+        <include refid="like"/>
+    </select>
+
+    <select id="getStatus" resultType="top.lin.dictionary.entity.SystemDictionary">
+        select sys_dictionary.* from sys_dictionary left join sys_dictionary_index on sys_dictionary.dic_index_id =
+        sys_dictionary_index.dic_index_id where sys_dictionary_index.dic_name = '当前状态'
+    </select>
+
+    <select id="getType" resultType="top.lin.dictionary.entity.SystemDictionary">
+        select sys_dictionary.* from sys_dictionary left join sys_dictionary_index on sys_dictionary.dic_index_id =
+        sys_dictionary_index.dic_index_id where sys_dictionary_index.dic_name = '店铺类型'
+    </select>
+
+    <!--获取店铺以及店长的信息-->
+    <select id="getShopByShopId" resultMap="bis" parameterType="String">
+        select *
+        from bis_shop,bis_shop_user
+        where bis_shop.owner_id = bis_shop_user.shop_user_id
+        AND bis_shop_user.user_type = 1 AND bis_shop.is_del = 0 AND bis_shop_user.is_del = 0
+        and bis_shop.shop_id = #{shop_id}
+    </select>
+
+
+    <select id="getShop" resultType="bisShop" parameterType="String">
+        SELECT
+        <include refid="column"/>
+        FROM bis_shop WHERE owner_id = #{value} AND is_del = 0
+    </select>
+
+    <!--查出最后一条记录的id-->
+    <select id="findLastId" resultType="String">
+        SELECT shop_id FROM bis_shop ORDER BY shop_id DESC LIMIT 1
+    </select>
+
+
+    <!--判断商铺名称的唯一性-->
+    <select id="findByshopName" resultType="bisShop">
+        SELECT
+        *
+        FROM bis_shop
+        where 1=1
+        <if test="shopName != null and shopName != ''">
+            AND shop_name = #{shopName, jdbcType=VARCHAR} <!-- 商家商铺名称 -->
+        </if>
+    </select>
+    <!-- 根据主键修改数据持久化对象 -->
+    <update id="updateShop" parameterType="bisShop">
+        UPDATE bis_shop
+        <set>
+            <if test="ownerId != null">
+                owner_id = #{ownerId, jdbcType=VARCHAR},  <!-- 店主编号 -->
+            </if>
+            <if test="shopName != null">
+                shop_name = #{shopName, jdbcType=VARCHAR},  <!-- 商店名称 -->
+            </if>
+            <if test="shortName != null">
+                short_name = #{shortName, jdbcType=VARCHAR},  <!-- 商家简称 -->
+            </if>
+            <if test="monthCashIn != null">
+                month_cash_in = #{monthCashIn, jdbcType=VARCHAR},  <!-- 月目标现金收入 -->
+            </if>
+            <if test="monthExpendIn != null">
+                month_expend_in = #{monthExpendIn, jdbcType=VARCHAR},  <!-- 月目标消耗收入 -->
+            </if>
+            <if test="shopLicense != null">
+                shop_license = #{shopLicense, jdbcType=VARCHAR},  <!-- 商家营业执照 -->
+            </if>
+            <if test="shopImage != null">
+                shop_image = #{shopImage, jdbcType=VARCHAR},  <!-- 商家标志图片 -->
+            </if>
+            <if test="shopDetailImage != null">
+                shop_detail_image = #{shopDetailImage, jdbcType=VARCHAR},  <!-- 详情图片 -->
+            </if>
+            <if test="gpsX != null">
+                gps_x = #{gpsX, jdbcType=VARCHAR},  <!-- x坐标 -->
+            </if>
+            <if test="gpsY != null">
+                gps_y = #{gpsY, jdbcType=VARCHAR},  <!-- y坐标 -->
+            </if>
+            <if test="sortNo != null">
+                sort_no = #{sortNo, jdbcType=INTEGER},  <!-- 排序号 -->
+            </if>
+            <if test="shopAddress != null">
+                shop_address = #{shopAddress, jdbcType=VARCHAR},  <!-- 店铺地址 -->
+            </if>
+            <if test="shopQrcode != null">
+                shop_qrcode = #{shopQrcode, jdbcType=VARCHAR},  <!-- 店铺二维码 -->
+            </if>
+            <if test="shopPhone != null">
+                shop_phone = #{shopPhone, jdbcType=VARCHAR},  <!-- 店铺电话 -->
+            </if>
+            <if test="shopArea != null">
+                shop_area = #{shopArea, jdbcType=VARCHAR},  <!-- 店铺面积 -->
+            </if>
+            <if test="shopProject != null">
+                shop_project = #{shopProject, jdbcType=VARCHAR},  <!-- 店铺主营项目 -->
+            </if>
+            <if test="shopType != null">
+                shop_type = #{shopType, jdbcType=VARCHAR},  <!-- 店铺类型 -->
+            </if>
+            <if test="shopIntro != null">
+                shop_intro = #{shopIntro, jdbcType=VARCHAR},  <!-- 商家介绍 -->
+            </if>
+            <if test="showStatus != null">
+                show_status = #{showStatus, jdbcType=VARCHAR},  <!-- 显示状态 0禁用 1启用 -->
+            </if>
+            <if test="isDel != null">
+                is_del = #{isDel, jdbcType=VARCHAR},  <!-- 是否删除 0:有效1:删除 -->
+            </if>
+            <if test="shopRemark != null">
+                shop_remark = #{shopRemark, jdbcType=VARCHAR},  <!-- shop_remark -->
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime, jdbcType=VARCHAR},  <!-- 营业开始时间 -->
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime, jdbcType=VARCHAR},  <!-- 营业结束时间 -->
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime, jdbcType=VARCHAR},  <!-- 创建时间 -->
+            </if>
+            <if test="createUserId != null">
+                create_user_id = #{createUserId, jdbcType=VARCHAR},  <!-- 创建人ID -->
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime, jdbcType=VARCHAR},  <!-- 修改时间 -->
+            </if>
+            <if test="modifyUserId != null">
+                modify_user_id = #{modifyUserId, jdbcType=VARCHAR},  <!-- 修改用户ID -->
+            </if>
+        </set>
+        WHERE shop_id = #{shopId}
+    </update>
+
+    <!-- 插入一个数据持久化对象(插入字段为传入PO实体的非空属性) -->
+    <insert id="addShop" parameterType="bisShop">
+        INSERT INTO bis_shop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ownerId != null and ownerId != ''">
+                owner_id, <!-- 店主编号 -->
+            </if>
+            <if test="shopName != null and shopName != ''">
+                shop_name, <!-- 商店名称 -->
+            </if>
+            <if test="shortName != null and shortName != ''">
+                short_name, <!-- 商家简称 -->
+            </if>
+            <if test="monthCashIn != null and monthCashIn != ''">
+                month_cash_in, <!-- 月目标现金收入 -->
+            </if>
+            <if test="monthExpendIn != null and monthExpendIn != ''">
+                month_expend_in, <!-- 月目标消耗收入 -->
+            </if>
+            <if test="shopLicense != null and shopLicense != ''">
+                shop_license, <!-- 商家营业执照 -->
+            </if>
+            <if test="shopImage != null and shopImage != ''">
+                shop_image, <!-- 商家标志图片 -->
+            </if>
+            <if test="shopDetailImage != null and shopDetailImage != ''">
+                shop_detail_image, <!-- 详情图片 -->
+            </if>
+            <if test="gpsX != null and gpsX != ''">
+                gps_x, <!-- x坐标 -->
+            </if>
+            <if test="gpsY != null and gpsY != ''">
+                gps_y, <!-- y坐标 -->
+            </if>
+            <if test="sortNo != null">
+                sort_no, <!-- 排序号 -->
+            </if>
+            <if test="shopAddress != null and shopAddress != ''">
+                shop_address, <!-- 店铺地址 -->
+            </if>
+            <if test="shopQrcode != null and shopQrcode != ''">
+                shop_qrcode, <!-- 店铺二维码 -->
+            </if>
+            <if test="shopPhone != null and shopPhone != ''">
+                shop_phone, <!-- 店铺电话 -->
+            </if>
+            <if test="shopArea != null and shopArea != ''">
+                shop_area, <!-- 店铺面积 -->
+            </if>
+            <if test="shopProject != null and shopProject != ''">
+                shop_project, <!-- 店铺主营项目 -->
+            </if>
+            <if test="shopType != null and shopType != ''">
+                shop_type, <!-- 店铺类型 -->
+            </if>
+            <if test="shopIntro != null and shopIntro != ''">
+                shop_intro, <!-- 商家介绍 -->
+            </if>
+            <if test="showStatus != null and showStatus != ''">
+                show_status, <!-- 显示状态 0禁用 1启用 -->
+            </if>
+            <if test="isDel != null and isDel != ''">
+                is_del, <!-- 是否删除 0:有效1:删除 -->
+            </if>
+            <if test="shopRemark != null and shopRemark != ''">
+                shop_remark, <!-- shop_remark -->
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                begin_time, <!-- 营业开始时间 -->
+            </if>
+            <if test="endTime != null and endTime != ''">
+                end_time, <!-- 营业结束时间 -->
+            </if>
+            <if test="createTime != null and createTime != ''">
+                create_time, <!-- 创建时间 -->
+            </if>
+            <if test="createUserId != null and createUserId != ''">
+                create_user_id, <!-- 创建人ID -->
+            </if>
+            <if test="modifyTime != null and modifyTime != ''">
+                modify_time, <!-- 修改时间 -->
+            </if>
+            <if test="modifyUserId != null and modifyUserId != ''">
+                modify_user_id, <!-- 修改用户ID -->
+            </if>
+            <if test="shopId != null and shopId != ''">
+                shop_id  <!-- 店铺编号 -->
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="ownerId != null and ownerId != ''">
+                #{ownerId, jdbcType=VARCHAR}, <!-- 店主编号 -->
+            </if>
+            <if test="shopName != null and shopName != ''">
+                #{shopName, jdbcType=VARCHAR}, <!-- 商店名称 -->
+            </if>
+            <if test="shortName != null and shortName != ''">
+                #{shortName, jdbcType=VARCHAR}, <!-- 商家简称 -->
+            </if>
+            <if test="monthCashIn != null and monthCashIn != ''">
+                #{monthCashIn, jdbcType=VARCHAR}, <!-- 月目标现金收入 -->
+            </if>
+            <if test="monthExpendIn != null and monthExpendIn != ''">
+                #{monthExpendIn, jdbcType=VARCHAR}, <!-- 月目标消耗收入 -->
+            </if>
+            <if test="shopLicense != null and shopLicense != ''">
+                #{shopLicense, jdbcType=VARCHAR}, <!-- 商家营业执照 -->
+            </if>
+            <if test="shopImage != null and shopImage != ''">
+                #{shopImage, jdbcType=VARCHAR}, <!-- 商家标志图片 -->
+            </if>
+            <if test="shopDetailImage != null and shopDetailImage != ''">
+                #{shopDetailImage, jdbcType=VARCHAR}, <!-- 详情图片 -->
+            </if>
+            <if test="gpsX != null and gpsX != ''">
+                #{gpsX, jdbcType=VARCHAR}, <!-- x坐标 -->
+            </if>
+            <if test="gpsY != null and gpsY != ''">
+                #{gpsY, jdbcType=VARCHAR}, <!-- y坐标 -->
+            </if>
+            <if test="sortNo != null">
+                #{sortNo, jdbcType=INTEGER}, <!-- 排序号 -->
+            </if>
+            <if test="shopAddress != null and shopAddress != ''">
+                #{shopAddress, jdbcType=VARCHAR}, <!-- 店铺地址 -->
+            </if>
+            <if test="shopQrcode != null and shopQrcode != ''">
+                #{shopQrcode, jdbcType=VARCHAR}, <!-- 店铺二维码 -->
+            </if>
+            <if test="shopPhone != null and shopPhone != ''">
+                #{shopPhone, jdbcType=VARCHAR}, <!-- 店铺电话 -->
+            </if>
+            <if test="shopArea != null and shopArea != ''">
+                #{shopArea, jdbcType=VARCHAR}, <!-- 店铺面积 -->
+            </if>
+            <if test="shopProject != null and shopProject != ''">
+                #{shopProject, jdbcType=VARCHAR}, <!-- 店铺主营项目 -->
+            </if>
+            <if test="shopType != null and shopType != ''">
+                #{shopType, jdbcType=VARCHAR}, <!-- 店铺类型 -->
+            </if>
+            <if test="shopIntro != null and shopIntro != ''">
+                #{shopIntro, jdbcType=VARCHAR}, <!-- 商家介绍 -->
+            </if>
+            <if test="showStatus != null and showStatus != ''">
+                #{showStatus, jdbcType=VARCHAR}, <!-- 显示状态 0禁用 1启用 -->
+            </if>
+            <if test="isDel != null and isDel != ''">
+                #{isDel, jdbcType=VARCHAR}, <!-- 是否删除 0:有效1:删除 -->
+            </if>
+            <if test="shopRemark != null and shopRemark != ''">
+                #{shopRemark, jdbcType=VARCHAR}, <!-- shop_remark -->
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                #{beginTime, jdbcType=VARCHAR}, <!-- 营业开始时间 -->
+            </if>
+            <if test="endTime != null and endTime != ''">
+                #{endTime, jdbcType=VARCHAR}, <!-- 营业结束时间 -->
+            </if>
+            <if test="createTime != null and createTime != ''">
+                #{createTime, jdbcType=VARCHAR}, <!-- 创建时间 -->
+            </if>
+            <if test="createUserId != null and createUserId != ''">
+                #{createUserId, jdbcType=VARCHAR}, <!-- 创建人ID -->
+            </if>
+            <if test="modifyTime != null and modifyTime != ''">
+                #{modifyTime, jdbcType=VARCHAR}, <!-- 修改时间 -->
+            </if>
+            <if test="modifyUserId != null and modifyUserId != ''">
+                #{modifyUserId, jdbcType=VARCHAR}, <!-- 修改用户ID -->
+            </if>
+            <if test="shopId != null and shopId != ''">
+                #{shopId, jdbcType=VARCHAR}  <!-- 店铺编号 -->
+            </if>
+        </trim>
+
+    </insert>
+
+    <!-- 插入一个数据持久化对象(含所有字段) -->
+    <insert id="insertAll" parameterType="bisShop">
+        INSERT INTO bis_shop (
+        shop_id,  <!-- 店铺编号 -->
+        owner_id,  <!-- 店主编号 -->
+        shop_name,  <!-- 商店名称 -->
+        short_name,  <!-- 商家简称 -->
+        month_cash_in,  <!-- 月目标现金收入 -->
+        month_expend_in,  <!-- 月目标消耗收入 -->
+        shop_license,  <!-- 商家营业执照 -->
+        shop_image,  <!-- 商家标志图片 -->
+        shop_detail_image,  <!-- 详情图片 -->
+        gps_x,  <!-- x坐标 -->
+        gps_y,  <!-- y坐标 -->
+        sort_no,  <!-- 排序号 -->
+        shop_address,  <!-- 店铺地址 -->
+        shop_qrcode,  <!-- 店铺二维码 -->
+        shop_phone,  <!-- 店铺电话 -->
+        shop_area,  <!-- 店铺面积 -->
+        shop_project,  <!-- 店铺主营项目 -->
+        shop_type,  <!-- 店铺类型 -->
+        shop_intro,  <!-- 商家介绍 -->
+        show_status,  <!-- 显示状态 0禁用 1启用 -->
+        is_del,  <!-- 是否删除 0:有效1:删除 -->
+        shop_remark,  <!-- shop_remark -->
+        begin_time,  <!-- 营业开始时间 -->
+        end_time,  <!-- 营业结束时间 -->
+        create_time,  <!-- 创建时间 -->
+        create_user_id,  <!-- 创建人ID -->
+        modify_time,  <!-- 修改时间 -->
+        modify_user_id  <!-- 修改用户ID -->
+        )
+        VALUES (
+        #{shopId, jdbcType=VARCHAR},   <!-- 店铺编号 -->
+        #{ownerId, jdbcType=VARCHAR},  <!-- 店主编号 -->
+        #{shopName, jdbcType=VARCHAR},  <!-- 商店名称 -->
+        #{shortName, jdbcType=VARCHAR},  <!-- 商家简称 -->
+        #{monthCashIn, jdbcType=VARCHAR},  <!-- 月目标现金收入 -->
+        #{monthExpendIn, jdbcType=VARCHAR},  <!-- 月目标消耗收入 -->
+        #{shopLicense, jdbcType=VARCHAR},  <!-- 商家营业执照 -->
+        #{shopImage, jdbcType=VARCHAR},  <!-- 商家标志图片 -->
+        #{shopDetailImage, jdbcType=VARCHAR},  <!-- 详情图片 -->
+        #{gpsX, jdbcType=VARCHAR},  <!-- x坐标 -->
+        #{gpsY, jdbcType=VARCHAR},  <!-- y坐标 -->
+        #{sortNo, jdbcType=INTEGER},  <!-- 排序号 -->
+        #{shopAddress, jdbcType=VARCHAR},  <!-- 店铺地址 -->
+        #{shopQrcode, jdbcType=VARCHAR},  <!-- 店铺二维码 -->
+        #{shopPhone, jdbcType=VARCHAR},  <!-- 店铺电话 -->
+        #{shopArea, jdbcType=VARCHAR},  <!-- 店铺面积 -->
+        #{shopProject, jdbcType=VARCHAR},  <!-- 店铺主营项目 -->
+        #{shopType, jdbcType=VARCHAR},  <!-- 店铺类型 -->
+        #{shopIntro, jdbcType=VARCHAR},  <!-- 商家介绍 -->
+        #{showStatus, jdbcType=VARCHAR},  <!-- 显示状态 0禁用 1启用 -->
+        #{isDel, jdbcType=VARCHAR},  <!-- 是否删除 0:有效1:删除 -->
+        #{shopRemark, jdbcType=VARCHAR},  <!-- shop_remark -->
+        #{beginTime, jdbcType=VARCHAR},  <!-- 营业开始时间 -->
+        #{endTime, jdbcType=VARCHAR},  <!-- 营业结束时间 -->
+        #{createTime, jdbcType=VARCHAR},  <!-- 创建时间 -->
+        #{createUserId, jdbcType=VARCHAR},  <!-- 创建人ID -->
+        #{modifyTime, jdbcType=VARCHAR},  <!-- 修改时间 -->
+        #{modifyUserId, jdbcType=VARCHAR}  <!-- 修改用户ID -->
+        )
+    </insert>
+
+    <!-- 表字段 -->
+    <sql id="column">
+        shop_id,  <!-- 店铺编号 -->
+        owner_id,  <!-- 店主编号 -->
+        shop_name,  <!-- 商店名称 -->
+        short_name,  <!-- 商家简称 -->
+        month_cash_in,  <!-- 月目标现金收入 -->
+        month_expend_in,  <!-- 月目标消耗收入 -->
+        shop_license,  <!-- 商家营业执照 -->
+        shop_image,  <!-- 商家标志图片 -->
+        shop_detail_image,  <!-- 详情图片 -->
+        gps_x,  <!-- x坐标 -->
+        gps_y,  <!-- y坐标 -->
+        sort_no,  <!-- 排序号 -->
+        shop_address,  <!-- 店铺地址 -->
+        shop_qrcode,  <!-- 店铺二维码 -->
+        shop_phone,  <!-- 店铺电话 -->
+        shop_area,  <!-- 店铺面积 -->
+        shop_project,  <!-- 店铺主营项目 -->
+        shop_type,  <!-- 店铺类型 -->
+        shop_intro,  <!-- 商家介绍 -->
+        show_status,  <!-- 显示状态 0禁用 1启用 -->
+        is_del,  <!-- 是否删除 0:有效1:删除 -->
+        shop_remark,  <!-- shop_remark -->
+        begin_time,  <!-- 营业开始时间 -->
+        end_time,  <!-- 营业结束时间 -->
+        create_time,  <!-- 创建时间 -->
+        create_user_id,  <!-- 创建人ID -->
+        modify_time,  <!-- 修改时间 -->
+        modify_user_id  <!-- 修改用户ID -->
+    </sql>
+
+    <!-- Where精确匹配字段 -->
+    <sql id="equal">
+        <if test="shopId != null and shopId != ''">
+            AND shop_id = #{shopId}  <!-- 店铺编号 -->
+        </if>
+        <if test="account != null and account != ''">
+            AND account = #{account}  <!-- 营业执照号 -->
+        </if>
+        <if test="shopName != null and shopName != ''">
+            AND shop_name = #{shopName}  <!-- 商店名称 -->
+        </if>
+        <if test="shortName != null and shortName != ''">
+            AND short_name = #{shortName}  <!-- 商家简称 -->
+        </if>
+        <if test="shopLicense != null and shopLicense != ''">
+            AND shop_license = #{shopLicense}  <!-- 商家营业执照 -->
+        </if>
+        <if test="showStatus != null and showStatus != ''">
+            AND show_status = #{showStatus}  <!-- 显示状态 0禁用 1启用 -->
+        </if>
+    </sql>
+
+    <!-- Where模糊匹配字段 -->
+    <sql id="like">
+        <if test="shopId != null and shopId != ''">
+            AND bis_shop.shop_id LIKE '%${shopId}%'  <!-- 店铺编号 -->
+        </if>
+        <if test="account != null and account != ''">
+            AND account like '%${account}%'  <!-- 营业执照号 -->
+        </if>
+        <if test="shopName != null and shopName != ''">
+            AND shop_name LIKE '%${shopName}%'  <!-- 商店名称 -->
+        </if>
+        <if test="shortName != null and shortName != ''">
+            AND short_name LIKE '%${shortName}%'  <!-- 商家简称 -->
+        </if>
+        <if test="shopLicense != null and shopLicense != ''">
+            AND shop_license LIKE '%${shopLicense}%'  <!-- 商家营业执照 -->
+        </if>
+        <if test="showStatus != null and showStatus != ''">
+            AND show_status LIKE '%${showStatus}%'  <!-- 显示状态 0禁用 1启用 -->
+        </if>
+    </sql>
 </mapper>

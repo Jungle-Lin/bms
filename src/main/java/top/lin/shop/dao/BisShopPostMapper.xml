@@ -6,4 +6,171 @@
     <select id="getAllBisShopPosts" resultType="bisShopPost">
         select * from bis_shop_post
     </select>
+
+    <!--分页查询职位列表-->
+    <select id="rows" resultType="bisShopPost">
+        select
+        *
+        from bis_shop_post where 1=1
+        <include refid="like"/>
+        limit #{ownerPage.offset},#{ownerPage.limit}
+    </select>
+
+    <select id="total" resultType="Integer" parameterType="bisShopPost">
+        select
+        count(1)
+        from bis_shop_post
+        where 1=1
+        <include refid="like1"/>
+    </select>
+
+    <!--检查职位编码的唯一性-->
+    <select id="findByPostCode" resultType="bisShopPost" parameterType="String">
+        select
+        *
+        from bis_shop_post where 1=1
+        and bis_shop_post.post_code=#{value}
+    </select>
+
+    <!--检查职位名称的唯一性-->
+    <select id="findByPostName" resultType="bisShopPost" parameterType="String">
+        select
+        *
+        from bis_shop_post where 1=1
+        and bis_shop_post.post_name=#{value}
+    </select>
+
+    <!-- 根据主键修改数据持久化对象 -->
+    <update id="updatePost" parameterType="bisShopPost">
+        UPDATE bis_shop_post
+        <set>
+            <if test="postName != null">
+                post_name = #{postName, jdbcType=VARCHAR},  <!-- 职位名称 -->
+            </if>
+            <if test="postCode != null">
+                post_code = #{postCode, jdbcType=VARCHAR},  <!-- 职位编码 -->
+            </if>
+            <if test="postDesc != null">
+                post_desc = #{postDesc, jdbcType=VARCHAR},  <!-- 职位描述 -->
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime, jdbcType=VARCHAR},  <!-- 创建时间 -->
+            </if>
+            <if test="createUserId != null">
+                create_user_id = #{createUserId, jdbcType=VARCHAR},  <!-- 创建人ID -->
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime, jdbcType=VARCHAR},  <!-- 修改时间 -->
+            </if>
+            <if test="modifyUserId != null">
+                modify_user_id = #{modifyUserId, jdbcType=VARCHAR},  <!-- 修改用户ID -->
+            </if>
+        </set>
+        WHERE post_id = #{postId}
+    </update>
+
+    <!--查出最后一条记录的id-->
+    <select id="findLastId" resultType="String">
+        SELECT post_id FROM bis_shop_post ORDER BY post_id DESC LIMIT 1
+    </select>
+
+    <!-- 根据主键查询并返回数据持久化对象 -->
+    <select id="findByPostId" resultType="bisShopPost">
+        SELECT
+        <include refid="column"/>
+        FROM bis_shop_post WHERE post_id = #{post_id}
+    </select>
+
+    <!-- 根据主键删除数据持久化对象 -->
+    <delete id="deleteByPostId">
+        delete from bis_shop_post WHERE post_id = #{post_id}
+    </delete>
+
+    <!-- 插入一个数据持久化对象(插入字段为传入PO实体的非空属性) -->
+    <insert id="addPost" parameterType="bisShopPost">
+        INSERT INTO bis_shop_post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="postName != null and postName != ''">
+                post_name, <!-- 职位名称 -->
+            </if>
+            <if test="postCode != null and postCode != ''">
+                post_code, <!-- 职位编码 -->
+            </if>
+            <if test="postDesc != null and postDesc != ''">
+                post_desc, <!-- 职位描述 -->
+            </if>
+            <if test="createTime != null and createTime != ''">
+                create_time, <!-- 创建时间 -->
+            </if>
+            <if test="createUserId != null and createUserId != ''">
+                create_user_id, <!-- 创建人ID -->
+            </if>
+            <if test="modifyTime != null and modifyTime != ''">
+                modify_time, <!-- 修改时间 -->
+            </if>
+            <if test="modifyUserId != null and modifyUserId != ''">
+                modify_user_id, <!-- 修改用户ID -->
+            </if>
+            <if test="postId != null and postId != ''">
+                post_id  <!-- 职位编号 -->
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="postName != null and postName != ''">
+                #{postName, jdbcType=VARCHAR}, <!-- 职位名称 -->
+            </if>
+            <if test="postCode != null and postCode != ''">
+                #{postCode, jdbcType=VARCHAR}, <!-- 职位编码 -->
+            </if>
+            <if test="postDesc != null and postDesc != ''">
+                #{postDesc, jdbcType=VARCHAR}, <!-- 职位描述 -->
+            </if>
+            <if test="createTime != null and createTime != ''">
+                #{createTime, jdbcType=VARCHAR}, <!-- 创建时间 -->
+            </if>
+            <if test="createUserId != null and createUserId != ''">
+                #{createUserId, jdbcType=VARCHAR}, <!-- 创建人ID -->
+            </if>
+            <if test="modifyTime != null and modifyTime != ''">
+                #{modifyTime, jdbcType=VARCHAR}, <!-- 修改时间 -->
+            </if>
+            <if test="modifyUserId != null and modifyUserId != ''">
+                #{modify_user_id, jdbcType=VARCHAR}, <!-- 修改用户ID -->
+            </if>
+            <if test="postId != null and postId != ''">
+                #{postId, jdbcType=VARCHAR}  <!-- 职位编号 -->
+            </if>
+        </trim>
+
+    </insert>
+
+    <!-- Where模糊匹配字段 -->
+    <sql id="like">
+        <if test="post.postCode != null and post.postCode != ''">
+            AND post_code LIKE concat('%',#{post.postCode},'%')  <!-- 用户账号 -->
+        </if>
+        <if test="post.postName != null and post.postName != ''">
+            AND post_name LIKE concat('%',#{post.postName},'%')  <!-- 店铺名称 -->
+        </if>
+    </sql>
+
+    <sql id="like1">
+        <if test="postCode != null and postCode != ''">
+            AND post_code LIKE concat('%',#{postCode},'%')  <!-- 用户账号 -->
+        </if>
+        <if test="postName != null and postName != ''">
+            AND post_name LIKE concat('%',#{postName},'%')  <!-- 店铺名称 -->
+        </if>
+    </sql>
+    <!-- 表字段 -->
+    <sql id="column">
+        post_id,  <!-- 职位编号 -->
+        post_name,  <!-- 职位名称 -->
+        post_code,  <!-- 职位编码 -->
+        post_desc,  <!-- 职位描述 -->
+        create_time,  <!-- 创建时间 -->
+        create_user_id,  <!-- 创建人ID -->
+        modify_time,  <!-- 修改时间 -->
+        modify_user_id  <!-- 修改用户ID -->
+    </sql>
 </mapper>
